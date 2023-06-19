@@ -1,6 +1,7 @@
 import sys
 sys.path.append('./')
 sys.path.append('../')
+sys.path.append('../simple_converge/')
 
 import os
 os.environ['nnUNet_raw'] = "/mnt/share/nnunet/nnUNet_raw"
@@ -36,7 +37,8 @@ def find_free_network_port() -> int:
     return port
 
 
-def get_trainer_from_args(dataset_name_or_id: Union[int, str],
+def get_trainer_from_args(args,
+                          dataset_name_or_id: Union[int, str],
                           configuration: str,
                           fold: int,
                           trainer_name: str = 'nnUNetTrainer',
@@ -70,7 +72,7 @@ def get_trainer_from_args(dataset_name_or_id: Union[int, str],
     plans_file = join(preprocessed_dataset_folder_base, plans_identifier + '.json')
     plans = load_json(plans_file)
     dataset_json = load_json(join(preprocessed_dataset_folder_base, 'dataset.json'))
-    nnunet_trainer = nnunet_trainer(plans=plans, configuration=configuration, fold=fold,
+    nnunet_trainer = nnunet_trainer(args, plans=plans, configuration=configuration, fold=fold,
                                     dataset_json=dataset_json, unpack_dataset=not use_compressed, device=device)
     return nnunet_trainer
 
@@ -141,7 +143,8 @@ def run_ddp(rank, dataset_name_or_id, configuration, fold, tr, p, use_compressed
     cleanup_ddp()
 
 
-def run_training(dataset_name_or_id: Union[str, int],
+def run_training(args,
+                 dataset_name_or_id: Union[str, int],
                  configuration: str, fold: Union[int, str],
                  trainer_class_name: str = 'nnUNetTrainer',
                  plans_identifier: str = 'nnUNetPlans',
@@ -154,7 +157,8 @@ def run_training(dataset_name_or_id: Union[str, int],
                  disable_checkpointing: bool = False,
                  device: torch.device = torch.device('cuda'),
                  num_epochs: int = 1000,
-                 disable_mirroring: bool = False):
+                 disable_mirroring: bool = False,
+                 ):
     if isinstance(fold, str):
         if fold != 'all':
             try:
@@ -190,7 +194,7 @@ def run_training(dataset_name_or_id: Union[str, int],
                  nprocs=num_gpus,
                  join=True)
     else:
-        nnunet_trainer = get_trainer_from_args(dataset_name_or_id, configuration, fold, trainer_class_name,
+        nnunet_trainer = get_trainer_from_args(args, dataset_name_or_id, configuration, fold, trainer_class_name,
                                                plans_identifier, use_compressed_data, device=device)
         nnunet_trainer.num_epochs = num_epochs
 
@@ -223,7 +227,7 @@ def run_training_entry():
                         help="Configuration that should be trained")
     parser.add_argument('fold', type=str,
                         help='Fold of the 5-fold cross-validation. Should be an int between 0 and 4.')
-    parser.add_argument('-tr', type=str, required=False, default='nnUNetTrainer_DeepLabV3',  # default='nnUNetTrainer',
+    parser.add_argument('-tr', type=str, required=False, default='nnUNetTrainer',
                         help='[OPTIONAL] Use this flag to specify a custom trainer. Default: nnUNetTrainer')
     parser.add_argument('-p', type=str, required=False, default='nnUNetPlans',
                         help='[OPTIONAL] Use this flag to specify a custom plans identifier. Default: nnUNetPlans')
@@ -254,6 +258,12 @@ def run_training_entry():
                     help='Epoch count')
     parser.add_argument('--disable_mirroring', action='store_true', required=False,
                     help='[OPTIONAL] Set this flag to disable mirroring.')
+
+    parser.add_argument('--use_mlops', action='store_true', required=False)
+    parser.add_argument('--mlops_project_name', type=str, required=False, default='PROJECT')
+    parser.add_argument('--mlops_task_name', type=str, required=False, default='task')
+    parser.add_argument('--mlops_tags', nargs='+', type=str, required=False, default=['tag'])
+
     args = parser.parse_known_args()[0]
     if parser.parse_known_args()[1]:
         print("There are unknown args for training call: Are these intended?", parser.parse_known_args()[1])
@@ -272,7 +282,7 @@ def run_training_entry():
     else:
         device = torch.device('mps')
 
-    run_training(args.dataset_name_or_id, args.configuration, args.fold, args.tr, args.p, args.pretrained_weights,
+    run_training(args, args.dataset_name_or_id, args.configuration, args.fold, args.tr, args.p, args.pretrained_weights,
                  args.num_gpus, args.use_compressed, args.npz, args.c, args.val, args.disable_checkpointing,
                  device=device, num_epochs=args.num_epochs, disable_mirroring=args.disable_mirroring)
 
