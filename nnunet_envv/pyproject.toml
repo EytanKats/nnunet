@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "nnunet-envv"
+version = "0.1.0"
+description = ""
+authors = ["Christian Weihsbach <christian.weihsbach@uni-luebeck.de>"]
+readme = "README.md"
+packages = [{include = "nnunet_envv"}]
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.11"
+nnunetv2 = { path = "../", develop = true }
+matplotlib = "^3.5.1"
+ipykernel = "^6.13.0"
+ipywidgets = "^7.7.0"
+dill = "^0.3.5.1"
+
+meidic-vtach-utils = {git = "ssh://git@github.com/MDL-UzL/meidic_vtach_utils.git", rev = "main"}
+connected-components-3d = "^3.10.2"
+einops = "^0.6.0"
+nnunet = "^1.7.1"
+torchvision = "^0.15.2"
+nvidia-cublas-cu11 = "^11.11.3.6"
+nvidia-cuda-cupti-cu11 = "~11.7"
+nvidia-cuda-nvrtc-cu11 = "~11.7"
+nvidia-cuda-runtime-cu11 = "~11.7"
+nvidia-cudnn-cu11 = "^8.9.1.23"
+nvidia-cufft-cu11 = "^10.9.0.58"
+nvidia-curand-cu11 = "^10.3.0.86"
+nvidia-cusolver-cu11 = "^11.4.1.48"
+nvidia-cusparse-cu11 = "^11.7.5.86"
+nvidia-nccl-cu11 = "^2.16.5"
+nvidia-nvtx-cu11 = "~11.7"
+[build-system]
+requires = ["poetry-core @ git+https://github.com/python-poetry/poetry-core.git"]
+build-backend = "poetry.core.masonry.api"
