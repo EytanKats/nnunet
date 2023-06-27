@@ -3,9 +3,12 @@ sys.path.append('./')
 sys.path.append('../')
 
 import os
-os.environ['nnUNet_raw'] = "/mnt/share/nnunet/nnUNet_raw"
-os.environ['nnUNet_preprocessed'] = "/mnt/share/nnunet/nnUNet_preprocessed"
-os.environ['nnUNet_results'] = "/mnt/share/nnunet/nnUNet_results"
+# os.environ['nnUNet_raw'] = "/mnt/share/nnunet/nnUNet_raw"
+# os.environ['nnUNet_preprocessed'] = "/mnt/share/nnunet/nnUNet_preprocessed"
+# os.environ['nnUNet_results'] = "/mnt/share/nnunet/nnUNet_results"
+os.environ['nnUNet_raw'] = "/share/data_supergrover3/kats/nnunet/nnUNet_raw"
+os.environ['nnUNet_preprocessed'] = "/share/data_supergrover3/kats/nnunet/nnUNet_preprocessed"
+os.environ['nnUNet_results'] = "/share/data_supergrover3/kats/nnunet/nnUNet_results"
 
 from nnunetv2.configuration import default_num_processes
 from nnunetv2.experiment_planning.plan_and_preprocess_api import extract_fingerprints, plan_experiments, preprocess
@@ -124,7 +127,7 @@ def preprocess_entry():
 def plan_and_preprocess_entry():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', nargs='+', type=int, default=[802], required=False,
+    parser.add_argument('-d', nargs='+', type=int, default=[801], required=False,
                         help="[REQUIRED] List of dataset IDs. Example: 2 4 5. This will run fingerprint extraction, experiment "
                              "planning and preprocessing for these datasets. Can of course also be just one dataset")
     parser.add_argument('-fpe', type=str, required=False, default='DatasetFingerprintExtractor',
