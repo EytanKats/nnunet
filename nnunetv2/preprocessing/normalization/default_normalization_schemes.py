@@ -63,6 +63,18 @@ class CTNormalization(ImageNormalization):
         image = (image - mean_intensity) / max(std_intensity, 1e-8)
         return image
 
+class AbdomenCTNormalization(ImageNormalization):
+    leaves_pixels_outside_mask_at_zero_if_use_mask_for_norm_is_true = False
+
+    def run(self, image: np.ndarray, seg: np.ndarray = None) -> np.ndarray:
+        image = image.astype(self.target_dtype)
+        lower_bound = -175
+        upper_bound = 250
+        image = np.clip(image, lower_bound, upper_bound)
+        image = image - image.min()
+        image = image / np.clip(image.max(), a_min=1e-8, a_max=None)
+        return image
+
 
 class NoNormalization(ImageNormalization):
     leaves_pixels_outside_mask_at_zero_if_use_mask_for_norm_is_true = False
