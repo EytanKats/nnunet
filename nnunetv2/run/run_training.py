@@ -4,18 +4,18 @@ sys.path.append('../')
 sys.path.append('../simple_converge/')
 
 import os
-os.environ['nnUNet_raw'] = "/mnt/share/nnunet/nnUNet_raw"
-os.environ['nnUNet_preprocessed'] = "/mnt/share/nnunet/nnUNet_preprocessed"
-os.environ['nnUNet_results'] = "/mnt/share/nnunet/nnUNet_results"
-# os.environ['nnUNet_raw'] = "/share/data_supergrover3/kats/nnunet/nnUNet_raw"
-# os.environ['nnUNet_preprocessed'] = "/share/data_supergrover3/kats/nnunet/nnUNet_preprocessed"
-# os.environ['nnUNet_results'] = "/share/data_supergrover3/kats/nnunet/nnUNet_results"
+# os.environ['nnUNet_raw'] = "/mnt/share/nnunet/nnUNet_raw"
+# os.environ['nnUNet_preprocessed'] = "/mnt/share/nnunet/nnUNet_preprocessed"
+# os.environ['nnUNet_results'] = "/mnt/share/nnunet/nnUNet_results"
+os.environ['nnUNet_raw'] = "/share/data_supergrover3/kats/nnunet/nnUNet_raw"
+os.environ['nnUNet_preprocessed'] = "/share/data_supergrover3/kats/nnunet/nnUNet_preprocessed"
+os.environ['nnUNet_results'] = "/share/data_supergrover3/kats/nnunet/nnUNet_results"
 
 # Set enumeration order of GPUs to be same as for 'nvidia-smi' command and choose visible GPUs
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
-os.environ['NNUNET_DEBUG_FLAG'] = "1"
+# os.environ['NNUNET_DEBUG_FLAG'] = "1"
 
 import socket
 from typing import Union, Optional
@@ -267,6 +267,9 @@ def run_training_entry():
                     help='Epoch count')
     parser.add_argument('--disable_mirroring', action='store_true', required=False,
                     help='[OPTIONAL] Set this flag to disable mirroring.')
+
+    parser.add_argument('--custom_initial_lr', type=float, required=False, default=0.01)
+    parser.add_argument('--custom_pretrained_weights', type=str, required=False, default='')
 
     parser.add_argument('--use_mlops', action='store_true', required=False)
     parser.add_argument('--mlops_project_name', type=str, required=False, default='PROJECT')
