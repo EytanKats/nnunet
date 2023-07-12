@@ -18,7 +18,7 @@ class SwinUNETR_Local(nn.Module):
             in_channels=1,
             out_channels=12,
             feature_size=48,
-            use_checkpoint=False
+            use_checkpoint=True
         )
 
         self.tuple_output = True
