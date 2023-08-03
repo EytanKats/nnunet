@@ -164,6 +164,9 @@ class nnUNetTrainer(object):
                               timestamp.second))
         self.logger = nnUNetLogger()
 
+        self.splits_file = args.splits_file
+        self.actual_validation_splits_file = args.actual_validation_splits_file
+
         ### placeholders
         self.dataloader_train = self.dataloader_val = None  # see on_train_start
 
@@ -495,7 +498,7 @@ class nnUNetTrainer(object):
             finally:
                 empty_cache(self.device)
 
-    def do_split(self):
+    def do_split(self, splits_file="splits_final.json"):
         """
         The default split is a 5 fold CV on all available training cases. nnU-Net will create a split (it is seeded,
         so always the same) and save it as splits_final.pkl file in the preprocessed data directory.
@@ -512,7 +515,7 @@ class nnUNetTrainer(object):
             tr_keys = case_identifiers
             val_keys = tr_keys
         else:
-            splits_file = join(self.preprocessed_dataset_folder_base, "splits_final.json")
+            splits_file = join(self.preprocessed_dataset_folder_base, splits_file)
             dataset = nnUNetDataset(self.preprocessed_dataset_folder, case_identifiers=None,
                                     num_images_properties_loading_threshold=0,
                                     folder_with_segs_from_previous_stage=self.folder_with_segs_from_previous_stage)
@@ -561,7 +564,7 @@ class nnUNetTrainer(object):
 
     def get_tr_and_val_datasets(self):
         # create dataset split
-        tr_keys, val_keys = self.do_split()
+        tr_keys, val_keys = self.do_split(self.splits_file)
 
         # load the datasets for training and validation. Note that we always draw random samples so we really don't
         # care about distributing training cases across GPUs.
@@ -1108,7 +1111,7 @@ class nnUNetTrainer(object):
 
                 # we cannot use self.get_tr_and_val_datasets() here because we might be DDP and then we have to distribute
                 # the validation keys across the workers.
-                _, val_keys = self.do_split()
+                _, val_keys = self.do_split(self.actual_validation_splits_file)
                 if self.is_ddp:
                     val_keys = val_keys[self.local_rank:: dist.get_world_size()]
 
@@ -1213,7 +1216,7 @@ class nnUNetTrainer(object):
 
             # we cannot use self.get_tr_and_val_datasets() here because we might be DDP and then we have to distribute
             # the validation keys across the workers.
-            _, val_keys = self.do_split()
+            _, val_keys = self.do_split(self.actual_validation_splits_file)
             if self.is_ddp:
                 val_keys = val_keys[self.local_rank:: dist.get_world_size()]
 

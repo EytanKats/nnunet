@@ -2,6 +2,7 @@ import sys
 sys.path.append('./')
 sys.path.append('../')
 sys.path.append('../simple_converge/')
+sys.path.append('../gvsl/')
 
 import os
 # os.environ['nnUNet_raw'] = "/mnt/share/nnunet/nnUNet_raw"
@@ -13,7 +14,7 @@ os.environ['nnUNet_results'] = "/share/data_supergrover3/kats/nnunet/nnUNet_resu
 
 # Set enumeration order of GPUs to be same as for 'nvidia-smi' command and choose visible GPUs
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 # os.environ['NNUNET_DEBUG_FLAG'] = "1"
 
@@ -267,6 +268,9 @@ def run_training_entry():
                     help='Epoch count')
     parser.add_argument('--disable_mirroring', action='store_true', required=False,
                     help='[OPTIONAL] Set this flag to disable mirroring.')
+
+    parser.add_argument('--splits_file', type=str, required=False, default="splits_final.json")
+    parser.add_argument('--actual_validation_splits_file', type=str, required=False, default="splits_final.json")
 
     parser.add_argument('--custom_initial_lr', type=float, required=False, default=0.01)
     parser.add_argument('--custom_pretrained_weights', type=str, required=False, default='')
