@@ -12,7 +12,11 @@ class GVSL_Local(nn.Module):
 
         super().__init__()
 
-        self.model = UNet3D_GVSL(n_classes=12)
+        self.model = UNet3D_GVSL(
+            n_classes=13,
+            # pretrained_weights=None)
+            pretrained_weights='/share/data_supergrover3/kats/experiments/label/gvsl/nako_1000_pretraining_plainunet/GVSL_epoch_20.pth')
+
         self.tuple_output = True
 
     def forward(self, x):
@@ -25,7 +29,7 @@ class GVSL_Local(nn.Module):
             return x
 
 
-class nnUNetTrainer_GVSL_pretreinedMRI_200epochs(nnUNetTrainer_ClearML):
+class nnUNetTrainer_trying_things(nnUNetTrainer_ClearML):
 
     def __init__(
             self,
@@ -50,9 +54,13 @@ class nnUNetTrainer_GVSL_pretreinedMRI_200epochs(nnUNetTrainer_ClearML):
             enable_deep_supervision: bool = True
     ) -> nn.Module:
 
-        network = GVSL_Local()
-
+        # network = GVSL_Local()
+        network = UNet3D_GVSL(
+            n_classes=13,
+            # pretrained_weights=None)
+            pretrained_weights='/share/data_supergrover3/kats/experiments/label/gvsl/nako_1000_pretraining_plainunet/GVSL_epoch_120.pth')
         return network
 
     def set_deep_supervision_enabled(self, enabled: bool):
-        self.network.tuple_output = enabled
+        self.network.unet.deep_supervision = enabled
+        # self.network.tuple_output = enabled
